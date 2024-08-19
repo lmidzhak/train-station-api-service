@@ -38,3 +38,15 @@ class Route(models.Model):
 
     def __str__(self):
         return f"{self.source.name} - {self.destination.name}"
+
+
+class CrewMember(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.first_name + " " + self.last_name
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
