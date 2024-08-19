@@ -50,3 +50,20 @@ class CrewMember(models.Model):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class Journey(models.Model):
+    departure_time = models.DateTimeField()
+    arrival_time = models.DateTimeField()
+    train = models.ForeignKey(Train, on_delete=models.CASCADE)
+    route = models.ForeignKey(Route, on_delete=models.CASCADE)
+    crew_members = models.ManyToManyField(
+        CrewMember, on_delete=models.CASCADE, related_name="journeys"
+    )
+
+    class Meta:
+        ordering = ["-departure_time"]
+
+    def __str__(self):
+        return (f"{self.route.source.name} - "
+                f"{self.route.destination.name}: {self.departure_time}")
