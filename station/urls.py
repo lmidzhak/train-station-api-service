@@ -1,11 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from station.views import (
-    TrainTypeViewSet,
-    TrainViewSet,
-    StationViewSet
-)
+from station.views import TrainTypeViewSet, TrainViewSet, StationViewSet
 
 router = routers.DefaultRouter()
 router.register("train_types", TrainTypeViewSet)
