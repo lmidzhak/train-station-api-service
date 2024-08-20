@@ -32,8 +32,10 @@ class Station(models.Model):
 
 
 class Route(models.Model):
-    source = models.ForeignKey(Station, on_delete=models.CASCADE)
-    destination = models.ForeignKey(Station, on_delete=models.CASCADE)
+    source = models.ForeignKey(Station, on_delete=models.CASCADE, related_name="routes")
+    destination = models.ForeignKey(
+        Station, on_delete=models.CASCADE, related_name="route_destinations"
+    )
     distance = models.IntegerField()
 
     def __str__(self):
@@ -57,13 +59,13 @@ class Journey(models.Model):
     arrival_time = models.DateTimeField()
     train = models.ForeignKey(Train, on_delete=models.CASCADE)
     route = models.ForeignKey(Route, on_delete=models.CASCADE)
-    crew_members = models.ManyToManyField(
-        CrewMember, on_delete=models.CASCADE, related_name="journeys"
-    )
+    crew_members = models.ManyToManyField(CrewMember, related_name="journeys")
 
     class Meta:
         ordering = ["-departure_time"]
 
     def __str__(self):
-        return (f"{self.route.source.name} - "
-                f"{self.route.destination.name}: {self.departure_time}")
+        return (
+            f"{self.route.source.name} - "
+            f"{self.route.destination.name}: {self.departure_time}"
+        )
