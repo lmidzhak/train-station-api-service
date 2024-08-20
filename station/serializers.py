@@ -1,6 +1,16 @@
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
-from station.models import TrainType, Train, Station, Route, CrewMember, Journey
+from station.models import (
+    TrainType,
+    Train,
+    Station,
+    Route,
+    CrewMember,
+    Journey,
+    Order,
+    Ticket,
+)
 
 
 class TrainTypeSerializer(serializers.ModelSerializer):
@@ -49,5 +59,29 @@ class JourneySerializer(serializers.ModelSerializer):
             "arrival_time",
             "train",
             "route",
-            "crew_members"
+            "crew_members",
         )
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    def validate(self, attrs):
+        data = super(TicketSerializer, self).validate(attrs=attrs)
+        Ticket.validate_ticket(
+            attrs["cargo_number"],
+            attrs["seat_number"],
+            attrs["journey"].train,
+            ValidationError,
+        )
+        return data
+
+    class Meta:
+        model = Ticket
+        fields = ("id", "cargo_number", "seat_number", "journey")
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
+
+    class Meta:
+        model = Order
+        fields = ("id", "created_at")
