@@ -1,6 +1,14 @@
 from rest_framework import viewsets
 
-from station.models import TrainType, Train, Station, Route, CrewMember, Journey
+from station.models import (
+    TrainType,
+    Train,
+    Station,
+    Route,
+    CrewMember,
+    Journey,
+    Order
+)
 from station.serializers import (
     TrainTypeSerializer,
     TrainSerializer,
@@ -8,6 +16,7 @@ from station.serializers import (
     RouteSerializer,
     CrewMemberSerializer,
     JourneySerializer,
+    OrderSerializer,
 )
 
 
@@ -39,3 +48,8 @@ class CrewMemberViewSet(viewsets.ModelViewSet):
 class JourneyViewSet(viewsets.ModelViewSet):
     queryset = Journey.objects.all()
     serializer_class = JourneySerializer
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
