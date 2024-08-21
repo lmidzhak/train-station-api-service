@@ -37,6 +37,18 @@ class StationSerializer(serializers.ModelSerializer):
         model = Station
         fields = ("id", "name", "latitude", "longitude")
 
+    def validate(self, data):
+        if not (-90 <= data["latitude"] <= 90):
+            raise serializers.ValidationError(
+                {"latitude": f"Latitude must be in the range [-90, 90]"}
+            )
+
+        if not (-180 <= data["longitude"] <= 180):
+            raise serializers.ValidationError(
+                {"longitude": f"Longitude must be in the range [-180, 180]"}
+            )
+        return data
+
 
 class RouteSerializer(serializers.ModelSerializer):
     class Meta:
