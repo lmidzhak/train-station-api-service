@@ -1,4 +1,5 @@
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from station.models import TrainType, Train, Station, Route, CrewMember, Journey, Order
@@ -6,11 +7,13 @@ from station.permissions import IsAdminOrIfAuthenticatedReadOnly
 from station.serializers import (
     TrainTypeSerializer,
     TrainSerializer,
-    StationSerializer,
+    StationListSerializer,
     RouteSerializer,
     CrewMemberSerializer,
     JourneySerializer,
     OrderSerializer,
+    StationImageSerializer,
+    StationDetailSerializer,
 )
 
 
@@ -34,9 +37,34 @@ class TrainViewSet(
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
-class StationViewSet(viewsets.ModelViewSet):
+class StationViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    GenericViewSet,
+):
     queryset = Station.objects.all()
-    serializer_class = StationSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+    def upload_image(self, request, pk=None):
+        """Endpoint for uploading image to specific station"""
+        station = self.get_object()
+        serializer = self.get_serializer(station, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_serializer_class(self):
+        if self.action == "upload_image":
+            return StationImageSerializer
+        if self.action == "retrieve":
+            return StationDetailSerializer
+
+        return StationListSerializer
 
 
 class RouteViewSet(viewsets.ModelViewSet):

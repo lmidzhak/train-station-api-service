@@ -36,10 +36,10 @@ class TrainSerializer(serializers.ModelSerializer):
         )
 
 
-class StationSerializer(serializers.ModelSerializer):
+class StationListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Station
-        fields = ("id", "name", "latitude", "longitude")
+        fields = ("id", "name", "latitude", "longitude", "image")
 
     def validate(self, data):
         if not (-90 <= data["latitude"] <= 90):
@@ -52,6 +52,18 @@ class StationSerializer(serializers.ModelSerializer):
                 {"longitude": f"Longitude must be in the range [-180, 180]"}
             )
         return data
+
+
+class StationDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Station
+        fields = ("id", "name", "latitude", "longitude", "image")
+
+
+class StationImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Station
+        fields = ("id", "image")
 
 
 class RouteSerializer(serializers.ModelSerializer):
