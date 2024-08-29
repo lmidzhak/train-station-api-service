@@ -111,7 +111,25 @@ class RouteDetailSerializer(RouteListSerializer):
 class CrewMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = CrewMember
-        fields = ("id", "first_name", "last_name", "full_name")
+        fields = ("id", "first_name", "last_name", "full_name", "image")
+
+
+class CrewMemberListSerializer(CrewMemberSerializer):
+    class Meta:
+        model = CrewMember
+        fields = ("id", "full_name")
+
+
+class CrewMemberDetailSerializer(CrewMemberSerializer):
+    class Meta:
+        model = CrewMember
+        fields = ("id", "first_name", "last_name", "full_name", "image")
+
+
+class CrewMemberImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CrewMember
+        fields = ("id", "image")
 
 
 class JourneySerializer(serializers.ModelSerializer):

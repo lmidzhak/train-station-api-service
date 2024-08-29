@@ -62,9 +62,17 @@ class Route(models.Model):
         return f"{self.source.name} - {self.destination.name}"
 
 
+def crew_member_image_file_path(instance, filename):
+    _, extension = os.path.splitext(filename)
+    filename = f"{slugify(instance.full_name)}-{uuid.uuid4()}{extension}"
+
+    return os.path.join("uploads/crew-members/", filename)
+
+
 class CrewMember(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    image = models.ImageField(null=True, upload_to=crew_member_image_file_path)
 
     def __str__(self):
         return self.first_name + " " + self.last_name

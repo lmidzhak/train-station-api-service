@@ -16,6 +16,9 @@ from station.serializers import (
     StationDetailSerializer,
     RouteListSerializer,
     RouteDetailSerializer,
+    CrewMemberListSerializer,
+    CrewMemberDetailSerializer,
+    CrewMemberImageSerializer,
 )
 
 
@@ -87,9 +90,34 @@ class RouteViewSet(
         return RouteSerializer
 
 
-class CrewMemberViewSet(viewsets.ModelViewSet):
+class CrewMemberViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = CrewMember.objects.all()
-    serializer_class = CrewMemberSerializer
+
+    def get_serializer_class(self):
+        if self.action == "upload_image":
+            return CrewMemberImageSerializer
+        if self.action == "list":
+            return CrewMemberListSerializer
+        if self.action in ["retrieve", "update"]:
+            return CrewMemberDetailSerializer
+        return CrewMemberSerializer
+
+    def upload_image(self, request, pk=None):
+        """Endpoint for uploading image to specific crew member"""
+        crew_member = self.get_object()
+        serializer = self.get_serializer(crew_member, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class JourneyViewSet(viewsets.ModelViewSet):
