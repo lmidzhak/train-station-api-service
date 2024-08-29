@@ -44,6 +44,10 @@ class Station(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def station_coordinates(self):
+        return f"Latitude: {self.latitude}, Longitude: {self.longitude}"
+
 
 class Route(models.Model):
     source = models.ForeignKey(
@@ -52,7 +56,7 @@ class Route(models.Model):
     destination = models.ForeignKey(
         Station, on_delete=models.CASCADE, related_name="route_destinations"
     )
-    distance = models.IntegerField()
+    distance = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.source.name} - {self.destination.name}"

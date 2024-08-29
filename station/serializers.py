@@ -67,9 +67,45 @@ class StationImageSerializer(serializers.ModelSerializer):
 
 
 class RouteSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Route
         fields = ("id", "source", "destination", "distance")
+
+
+class RouteListSerializer(RouteSerializer):
+    source = serializers.SlugRelatedField(read_only=True, slug_field="name", many=False)
+    destination = serializers.SlugRelatedField(
+        read_only=True, slug_field="name", many=False
+    )
+
+    class Meta:
+        model = Route
+        fields = (
+            "id",
+            "source",
+            "destination",
+        )
+
+
+class RouteDetailSerializer(RouteListSerializer):
+    source_coordinates = serializers.CharField(
+        read_only=True, source="source.station_coordinates"
+    )
+    destination_coordinates = serializers.CharField(
+        read_only=True, source="destination.station_coordinates"
+    )
+
+    class Meta:
+        model = Route
+        fields = (
+            "id",
+            "source",
+            "source_coordinates",
+            "destination",
+            "destination_coordinates",
+            "distance",
+        )
 
 
 class CrewMemberSerializer(serializers.ModelSerializer):

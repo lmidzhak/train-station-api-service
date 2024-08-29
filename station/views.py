@@ -14,6 +14,8 @@ from station.serializers import (
     OrderSerializer,
     StationImageSerializer,
     StationDetailSerializer,
+    RouteListSerializer,
+    RouteDetailSerializer,
 )
 
 
@@ -67,9 +69,22 @@ class StationViewSet(
         return StationListSerializer
 
 
-class RouteViewSet(viewsets.ModelViewSet):
+class RouteViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    GenericViewSet,
+):
     queryset = Route.objects.all()
-    serializer_class = RouteSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return RouteListSerializer
+        if self.action == "retrieve":
+            return RouteDetailSerializer
+        return RouteSerializer
 
 
 class CrewMemberViewSet(viewsets.ModelViewSet):
