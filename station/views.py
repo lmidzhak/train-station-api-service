@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from django.db.models import Count, F
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -19,6 +22,8 @@ from station.serializers import (
     CrewMemberListSerializer,
     CrewMemberDetailSerializer,
     CrewMemberImageSerializer,
+    JourneyListSerializer,
+    JourneyDetailSerializer,
 )
 
 
@@ -98,6 +103,7 @@ class CrewMemberViewSet(
     viewsets.GenericViewSet,
 ):
     queryset = CrewMember.objects.all()
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "upload_image":
@@ -120,9 +126,54 @@ class CrewMemberViewSet(
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class JourneyViewSet(viewsets.ModelViewSet):
-    queryset = Journey.objects.all()
-    serializer_class = JourneySerializer
+class JourneyViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = (
+        Journey.objects.all()
+        .select_related("route", "train")
+        .annotate(
+            tickets_available=(
+                F("train__places_in_cargo") * F("train__cargo_num") - Count("tickets")
+            )
+        )
+    )
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+    def get_queryset(self):
+        arrival_date = self.request.query_params.get("arrival")
+        departure_date = self.request.query_params.get("departure")
+        destination = self.request.query_params.get("to")
+        source = self.request.query_params.get("from")
+
+        queryset = self.queryset
+
+        if arrival_date:
+            date = datetime.strptime(arrival_date, "%Y-%m-%d").date()
+            queryset = queryset.filter(arrival_time__date=date)
+
+        if departure_date:
+            date = datetime.strptime(departure_date, "%Y-%m-%d").date()
+            queryset = queryset.filter(departure_time__date=date)
+
+        if destination:
+            queryset = queryset.filter(route__destination__name__icontains=destination)
+
+        if source:
+            queryset = queryset.filter(route__source__name__icontains=source)
+
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return JourneyListSerializer
+        if self.action == "retrieve":
+            return JourneyDetailSerializer
+        return JourneySerializer
 
 
 class OrderViewSet(viewsets.ModelViewSet):
