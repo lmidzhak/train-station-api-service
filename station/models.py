@@ -121,8 +121,8 @@ class Ticket(models.Model):
     @staticmethod
     def validate_ticket(cargo_number, seat_number, train, error_to_raise):
         for ticket_attr_value, ticket_attr_name, train_attr_name in [
-            (cargo_number, "cargo_number", "cargo_numbers"),
-            (seat_number, "seat_number", "seat_numbers"),
+            (cargo_number, "cargo_number", "cargo_num"),
+            (seat_number, "seat_number", "places_in_cargo"),
         ]:
             count_attrs = getattr(train, train_attr_name)
             if not (1 <= ticket_attr_value <= count_attrs):
