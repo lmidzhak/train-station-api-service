@@ -111,7 +111,6 @@ class RouteDetailSerializer(RouteListSerializer):
 
 
 class CrewMemberSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = CrewMember
         fields = ("id", "first_name", "last_name", "full_name", "image")
