@@ -46,12 +46,12 @@ class StationListSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if not (-90 <= data["latitude"] <= 90):
             raise serializers.ValidationError(
-                {"latitude": f"Latitude must be in the range [-90, 90]"}
+                {"latitude": "Latitude must be in the range [-90, 90]"}
             )
 
         if not (-180 <= data["longitude"] <= 180):
             raise serializers.ValidationError(
-                {"longitude": f"Longitude must be in the range [-180, 180]"}
+                {"longitude": "Longitude must be in the range [-180, 180]"}
             )
         return data
 
@@ -76,7 +76,9 @@ class RouteSerializer(serializers.ModelSerializer):
 
 
 class RouteListSerializer(RouteSerializer):
-    source = serializers.SlugRelatedField(read_only=True, slug_field="name", many=False)
+    source = serializers.SlugRelatedField(
+        read_only=True, slug_field="name", many=False
+    )
     destination = serializers.SlugRelatedField(
         read_only=True, slug_field="name", many=False
     )
@@ -135,7 +137,9 @@ class CrewMemberImageSerializer(serializers.ModelSerializer):
 
 
 class JourneySerializer(serializers.ModelSerializer):
-    train = serializers.SlugRelatedField(many=False, read_only=True, slug_field="name")
+    train = serializers.SlugRelatedField(
+        many=False, read_only=True, slug_field="name"
+    )
     route = serializers.StringRelatedField(many=False)
     departure_time = serializers.DateTimeField(
         read_only=True, format=train_service.settings.DATETIME_FORMAT
@@ -203,7 +207,9 @@ class TicketSeatSerializer(TicketSerializer):
 
 class JourneyDetailSerializer(JourneyListSerializer):
     crew_members = CrewMemberListSerializer(many=True, read_only=True)
-    taken_places = TicketSeatSerializer(source="tickets", many=True, read_only=True)
+    taken_places = TicketSeatSerializer(
+        source="tickets", many=True, read_only=True
+    )
 
     class Meta:
         model = Journey

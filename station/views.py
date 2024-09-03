@@ -2,7 +2,11 @@ from datetime import datetime
 
 from django.db.models import Count, F
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter, extend_schema_view
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiParameter,
+    extend_schema_view,
+)
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -10,7 +14,15 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from station.models import TrainType, Train, Station, Route, CrewMember, Journey, Order
+from station.models import (
+    TrainType,
+    Train,
+    Station,
+    Route,
+    CrewMember,
+    Journey,
+    Order,
+)
 from station.permissions import IsAdminOrIfAuthenticatedReadOnly
 from station.serializers import (
     TrainTypeSerializer,
@@ -68,10 +80,12 @@ class TrainViewSet(
         description="Get info about a train station with a given id number"
     ),
     update=extend_schema(
-        description="Update all info about a train station with a given id number"
+        description="Update all info about a "
+                    "train station with a given id number"
     ),
     partial_update=extend_schema(
-        description="Partial info update of a train station with a given id number"
+        description="Partial info update of a train"
+                    " station with a given id number"
     ),
 )
 class StationViewSet(
@@ -113,7 +127,9 @@ class StationViewSet(
 @extend_schema_view(
     list=extend_schema(description="Get a list of all routes"),
     create=extend_schema(description="Create new route"),
-    retrieve=extend_schema(description="Get info about route with a given id number"),
+    retrieve=extend_schema(
+        description="Get info about route with a given id number"
+    ),
     update=extend_schema(
         description="Update all info about route with a given id number"
     ),
@@ -142,12 +158,15 @@ class RouteViewSet(
 @extend_schema_view(
     list=extend_schema(description="Get a list of all crew members"),
     create=extend_schema(description="Create new crew member"),
-    retrieve=extend_schema(description="Get a crew member with given id number"),
+    retrieve=extend_schema(
+        description="Get a crew member with given id number"
+    ),
     update=extend_schema(
         description="Update all info for a crew member with given id number"
     ),
     partial_update=extend_schema(
-        description="Update partial info for a crew member with given id number"
+        description="Update partial info for a "
+                    "crew member with given id number"
     ),
 )
 class CrewMemberViewSet(
@@ -189,9 +208,13 @@ class CrewMemberViewSet(
 
 @extend_schema_view(
     create=extend_schema(description="Create new journey"),
-    retrieve=extend_schema(description="Get info about journey with given id number"),
+    retrieve=extend_schema(
+        description="Get info about journey with given id number"
+    ),
     update=extend_schema(description="Update all info about journey"),
-    partial_update=extend_schema(description="Partial update of info about journey"),
+    partial_update=extend_schema(
+        description="Partial update of info about journey"
+    ),
 )
 class JourneyViewSet(
     mixins.ListModelMixin,
@@ -205,7 +228,8 @@ class JourneyViewSet(
         .select_related("route", "train")
         .annotate(
             tickets_available=(
-                F("train__places_in_cargo") * F("train__cargo_num") - Count("tickets")
+                F("train__places_in_cargo") * F("train__cargo_num")
+                - Count("tickets")
             )
         )
     )
@@ -228,7 +252,9 @@ class JourneyViewSet(
             queryset = queryset.filter(departure_time__date=date)
 
         if destination:
-            queryset = queryset.filter(route__destination__name__icontains=destination)
+            queryset = queryset.filter(
+                route__destination__name__icontains=destination
+            )
 
         if source:
             queryset = queryset.filter(route__source__name__icontains=source)
@@ -252,17 +278,18 @@ class JourneyViewSet(
             OpenApiParameter(
                 "departure_date",
                 type=OpenApiTypes.DATE,
-                description="Filter by departure date (ex. ?departure=2024-08-24)",
+                description="Filter by departure "
+                            "date (ex. ?departure=2024-08-24)",
             ),
             OpenApiParameter(
                 "destination",
                 type=OpenApiTypes.STR,
-                description="Filter by destination station (ex. ?to=Lviv or ?to=lv)",
+                description="Filter by destination station (ex. ?to=lv)",
             ),
             OpenApiParameter(
                 "source",
                 type=OpenApiTypes.STR,
-                description="Filter by source station (ex. ?from=kh or ?from=Kharkiv)",
+                description="Filter by source station (ex. ?from=kh)",
             ),
         ]
     )
@@ -286,7 +313,9 @@ class OrderPagination(PageNumberPagination):
     partial_update=extend_schema(
         description="Partially update info of an order with given id number"
     ),
-    destroy=extend_schema(description="Delete info of an order with given id number"),
+    destroy=extend_schema(
+        description="Delete info of an order with given id number"
+    ),
 )
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.prefetch_related(
