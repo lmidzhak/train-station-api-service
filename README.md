@@ -22,7 +22,7 @@ The system provides functionalities for creating and managing train station tick
 
 Set environment variable:
 
-* Copy and rename the .env.sample file to .env
+
 * Open the .env file and edit the environment variables
 * Save the .env file securely
 * Make sure the .env file is in .gitignore
